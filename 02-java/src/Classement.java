@@ -7,7 +7,10 @@
        java -Dstdout.encoding=UTF-8 -cp out Main      (la production)
    ========================================================================= */
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Classement {
 
@@ -15,33 +18,98 @@ public class Classement {
     public static final int[] BAREME = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
 
     // 1. pointsPourPosition(position) : points marqués pour cette position.
-    //    1 -> 25, 2 -> 18, ..., 10 -> 1. Au-delà de la 10e place : 0.
-    //    Un abandon vaut la position 0, donc 0 point.
     public static int pointsPourPosition(int position) {
-        // À COMPLÉTER
-        return 0;
+        if (position < 1 || position > 10) {
+            return 0;
+        }
+        return BAREME[position - 1];
     }
 
-    // 2. classementPilotes(lignes) : un Resultat par pilote, avec ses points,
-    //    ses victoires (position 1) et ses 2e places, trié par :
-    //    points décroissants, puis victoires, puis 2e places, puis nom (A→Z).
+    // 2. classementPilotes(lignes) : un Resultat par pilote.
     public static List<Resultat> classementPilotes(List<Ligne> lignes) {
-        // À COMPLÉTER
-        return null;
+        Map<String, Resultat> parPilote = new LinkedHashMap<>();
+
+        for (Ligne ligne : lignes) {
+            Resultat r = parPilote.get(ligne.pilote());
+            if (r == null) {
+                r = new Resultat(ligne.pilote(), ligne.ecurie());
+                parPilote.put(ligne.pilote(), r);
+            }
+            r.points += pointsPourPosition(ligne.position());
+            if (ligne.position() == 1) {
+                r.victoires++;
+            }
+            if (ligne.position() == 2) {
+                r.deuxiemes++;
+            }
+        }
+
+        List<Resultat> classement = new ArrayList<>(parPilote.values());
+        classement.sort((a, b) -> {
+            if (a.points != b.points) {
+                return b.points - a.points;
+            }
+            if (a.victoires != b.victoires) {
+                return b.victoires - a.victoires;
+            }
+            if (a.deuxiemes != b.deuxiemes) {
+                return b.deuxiemes - a.deuxiemes;
+            }
+            return a.nom.compareTo(b.nom);
+        });
+
+        return classement;
     }
 
-    // 3. classementEcuries(pilotes) : additionne les points, victoires et
-    //    2e places des pilotes de chaque écurie. Même ordre de tri.
+    // 3. classementEcuries(pilotes) : additionne les points de ses pilotes.
     public static List<Resultat> classementEcuries(List<Resultat> pilotes) {
-        // À COMPLÉTER
-        return null;
+        Map<String, Resultat> parEcurie = new LinkedHashMap<>();
+
+        for (Resultat p : pilotes) {
+            Resultat e = parEcurie.get(p.ecurie);
+            if (e == null) {
+                e = new Resultat(p.ecurie, "");
+                parEcurie.put(p.ecurie, e);
+            }
+            e.points += p.points;
+            e.victoires += p.victoires;
+            e.deuxiemes += p.deuxiemes;
+        }
+
+        List<Resultat> classement = new ArrayList<>(parEcurie.values());
+        classement.sort((a, b) -> {
+            if (a.points != b.points) {
+                return b.points - a.points;
+            }
+            if (a.victoires != b.victoires) {
+                return b.victoires - a.victoires;
+            }
+            if (a.deuxiemes != b.deuxiemes) {
+                return b.deuxiemes - a.deuxiemes;
+            }
+            return a.nom.compareTo(b.nom);
+        });
+
+        return classement;
     }
 
-    // 4. positionMoyenne(lignes, pilote) : moyenne des positions de ce pilote,
-    //    ABANDONS EXCLUS, arrondie à 2 décimales. 0 s'il n'a jamais terminé.
-    //    Ex. positions 1, 2 et un abandon -> 1.5
+    // 4. positionMoyenne(lignes, pilote) : moyenne des positions, abandons exclus.
     public static double positionMoyenne(List<Ligne> lignes, String pilote) {
-        // À COMPLÉTER
-        return 0;
+        int somme = 0;
+        int nombre = 0;
+
+        for (Ligne ligne : lignes) {
+            if (ligne.pilote().equals(pilote) && ligne.position() != 0) {
+                somme += ligne.position();
+                nombre++;
+            }
+        }
+
+        if (nombre == 0) {
+            return 0;
+        }
+
+        double moyenne = (double) somme / nombre;
+        return Math.round(moyenne * 100.0) / 100.0;
     }
 }
