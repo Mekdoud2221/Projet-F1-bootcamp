@@ -6,7 +6,6 @@ Pack complet : énoncé, données, squelettes, tests, extensions et corrigés.
 ENONCE.md                    l'énoncé étudiant (à lire en premier)
 donnees/resultats.csv        l'export brut du championnat
 01-python/ingestion.ipynb    maillon 1 — à compléter
-
 02-java/src/                 maillon 2 — Classement.java à compléter
 03-js/                       maillon 3 — app.js à compléter, index.html à ouvrir
 secours/                     résultats de référence, en cas de blocage
